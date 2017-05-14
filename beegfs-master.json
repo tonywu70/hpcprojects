@@ -64,8 +64,7 @@
       "type": "string",
       "defaultValue": "CentOS_7.2",
       "allowedValues": [
-        "CentOS_7.2",
-        "RHEL_7.2"
+        "CentOS_7.2"
       ],
       "metadata": {
         "description": "VM Image."
@@ -104,7 +103,9 @@
     "networkApiVersion": "2016-06-01",
     "insightsApiVersion": "2015-04-01",
     "location": "[resourceGroup().location]",
+	"installLIS": "bash InstallLIS.sh",
     "templatelink": "[uri(deployment().properties.templateLink.uri, 'Scripts')]",
+    "installLIS": "bash InstallLIS.sh",
     "PremiumStorageMap": {
       "P10": {
         "size": 128

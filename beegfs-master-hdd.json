@@ -123,8 +123,7 @@
       "type": "string",
       "defaultValue": "CentOS_7.2",
       "allowedValues": [
-        "CentOS_7.2",
-        "RHEL_7.2"
+        "CentOS_7.2"
       ],
       "metadata": {
         "description": "VM Image."

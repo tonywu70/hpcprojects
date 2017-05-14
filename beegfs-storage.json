@@ -1,240 +1,36 @@
 {
-  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "vmssName": {
-      "type": "string",
-      "metadata": {
-        "description": "OSS/MDS VMSS name."
-      },
-      "maxLength": 15
+      "type": "string"
     },
-    "nodeType": {
-      "type": "string",
-      "defaultValue": "all",
-      "allowedValues": [
-        "all",
-        "both",
-        "storage",
-        "meta",
-        "client"
-      ],
-      "metadata": {
-        "description": "type of beegfs node to deploy"
-      }
+    "vmsscount": {
+      "type": "int"
     },
-    "nodeCount": {
-      "type": "int",
-      "metadata": {
-        "description": "Number of BeeGFS nodes (100 or less)."
-      },
-      "defaultValue": 1,
-      "minValue": 1,
-      "maxValue": 100
+    "vmcount": {
+      "type": "int"
     },
-    "VMSize": {
-      "type": "string",
-      "defaultValue": "Standard_DS3_v2",
-      "allowedValues": [
-        "Standard_DS1",
-        "Standard_DS2",
-        "Standard_DS3",
-        "Standard_DS4",
-        "Standard_DS11",
-        "Standard_DS12",
-        "Standard_DS13",
-        "Standard_DS14",
-        "Standard_DS1_v2",
-        "Standard_DS2_v2",
-        "Standard_DS3_v2",
-        "Standard_DS4_v2",
-        "Standard_DS5_v2",
-        "Standard_DS11_v2",
-        "Standard_DS12_v2",
-        "Standard_DS13_v2",
-        "Standard_DS14_v2",
-        "Standard_DS15_v2",
-        "Standard_F1s",
-        "Standard_F2s",
-        "Standard_F4s",
-        "Standard_F8s",
-        "Standard_F16s",
-        "Standard_GS1",
-        "Standard_GS2",
-        "Standard_GS3",
-        "Standard_GS4",
-        "Standard_GS5",
-        "Standard_L4s",
-        "Standard_L8s",
-        "Standard_L16s",
-        "Standard_L32s"
-      ],
-      "metadata": {
-        "description": "sku to use for the storage nodes - only premium disks VMs are allowed"
-      }
+    "beeGFSNodeSettings": {
+      "type": "object"
     },
-    "VMImage": {
-      "type": "string",
-      "defaultValue": "CentOS_7.2",
-      "allowedValues": [
-        "CentOS_7.2",
-        "RHEL_7.2"
-      ],
-      "metadata": {
-        "description": "VM Image."
-      }
-    },
-    "adminUsername": {
-      "type": "string",
-      "metadata": {
-        "description": "Admin username on all VMs."
-      }
-    },
-    "sshKeyData": {
-      "type": "string",
-      "metadata": {
-        "description": "SSH rsa public key file as a string."
-      }
-    },
-    "storageDiskSize": {
-      "type": "string",
-      "defaultValue": "P10",
-      "allowedValues": [
-        "P10",
-        "P20",
-        "P30"
-      ],
-      "metadata": {
-        "description": "Premium storage disk size used for the storage services"
-      }
-    },
-    "StorageDisksCount": {
-      "type": "int",
-      "defaultValue": 1,
-      "minValue": 1,
-      "maxValue": 63,
-      "metadata": {
-        "description": "Number of storage disks"
-      }
-    },
-    "metaDiskSize": {
-      "type": "string",
-      "defaultValue": "P10",
-      "allowedValues": [
-        "P10",
-        "P20",
-        "P30"
-      ],
-      "metadata": {
-        "description": "Premium storage disk size used for the metadata services"
-      }
-    },
-    "MetaDisksCount": {
-      "type": "int",
-      "defaultValue": 1,
-      "minValue": 1,
-      "maxValue": 4,
-      "metadata": {
-        "description": "Number of metadate disks"
-      }
-    },
-    "volumeType": {
-      "type": "string",
-      "defaultValue": "RAID0",
-      "allowedValues": [
-        "RAID0",
-        "RAID5"
-      ],
-      "metadata": {
-        "description": "Volume for data disks."
-      }
-    },
-    "RGvnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the RG of the virtual network which master server is using."
-      }
-    },
-    "masterName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of master VM name"
-      }
+    "nodeOSSettings": {
+      "type": "object"
     }
   },
   "variables": {
-    "publicIPAddressName": "[concat(parameters('vmssName'), 'pip')]",
-    "loadBalancerName": "[concat(parameters('vmssName'), 'lb')]",
-    "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]",
-    "lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('loadBalancerName'))]",
-    "natPoolName": "[concat(parameters('vmssName'), 'natpool')]",
-    "bePoolName": "[concat(parameters('vmssName'), 'bepool')]",
-    "natStartPort": 50000,
-    "natEndPort": 52000,
-    "natBackendPort": 22,
-    "nicName": "[concat(parameters('vmssName'), 'nic')]",
-    "ipConfigName": "[concat(parameters('vmssName'), 'ipconfig')]",
-    "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/loadBalancerFrontEnd')]",
     "networkApiVersion": "2016-06-01",
     "insightsApiVersion": "2015-04-01",
-    "location": "[resourceGroup().location]",
-    "PremiumStorageMap": {
-      "P10": {
-        "size": 128
-      },
-      "P20": {
-        "size": 512
-      },
-      "P30": {
-        "size": 1023
-      }
-    },
-    "RAIDMap": {
-      "RAID0": {
-        "value": 0
-      },
-      "RAID5": {
-        "value": 5
-      }
-    },
-    "image": "[parameters('VMImage')]",
-    "beeGFSNodeSettings": {
-      "vnetRG": "[parameters('RGvnetName')]",
-      "vnetName": "beegfs-vnet",
-      "subnetName": "beegfs-subnet",
-      "MasterName": "[parameters('masterName')]",
-      "nodeType": "[parameters('nodeType')]",
-      "customDomain": "mydom",
-      "VMsku": "[parameters('VMSize')]",
-      "RAIDLevel": "[variables('RAIDMap')[parameters('volumeType')].value]",
-      "storageDiskSize": "[variables('PremiumStorageMap')[parameters('storageDiskSize')].size]",
-      "numStorageDisks": "[parameters('storageDisksCount')]",
-      "metadataDiskSize": "[variables('PremiumStorageMap')[parameters('metaDiskSize')].size]",
-      "numMetadataDisks": "[parameters('MetaDisksCount')]"
-    },
-    "computeNodeImages": {
-      "CentOS_7.2": {
-        "publisher": "OpenLogic",
-        "offer": "CentOS",
-        "sku": "7.2",
-        "version": "latest"
-      },
-      "RHEL_7.2": {
-        "publisher": "RedHat",
-        "offer": "RHEL",
-        "sku": "7.2",
-        "version": "latest"
-      }
-    },
-    "nodeOSSettings": {
-      "adminUserName": "[parameters('adminUserName')]",
-      "sshKeyData": "[parameters('sshKeyData')]",
-      "imageReference": "[variables('computeNodeImages')[variables('image')]]"
-    },
-    "vnetID": "[resourceId(variables('beeGFSNodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', variables('beeGFSNodeSettings').vnetName)]",
-    "subnetRef": "[concat(variables('vnetID'),'/subnets/', variables('beeGFSNodeSettings').subnetName)]",
     "computeApiVersion": "2016-04-30-preview",
+    "location": "[resourceGroup().location]",
+    "beeGFSNodeSettings": "[parameters('beeGFSNodeSettings')]",
+    "nodeOSSettings": "[parameters('nodeOSSettings')]",
     "sshKeyPath": "[concat('/home/',variables('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]",
+    "virtualNetworkName": "beegfs-vnet",
+    "subnetName": "beegfs-subnet",
+    "nicName": "[concat(parameters('vmssName'), 'nic')]",
+    "ipConfigName": "[concat(parameters('vmssName'), 'ipconfig')]",
+    "installParams": "[concat(variables('beeGFSNodeSettings').MasterName,' ', variables('beeGFSNodeSettings').nodeType,' ', variables('beeGFSNodeSettings').RAIDLevel)]",
     "metadataDiskArray": [
       {
         "diskSizeGB": "[variables('beeGFSNodeSettings').metadataDiskSize]",
@@ -557,21 +353,38 @@
         "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
         "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 59)]",
         "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 60)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 61)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 62)]",
+        "createOption": "Empty"
       }
-    ],
-    "installParams": "[concat(variables('beeGFSNodeSettings').MasterName,' ', variables('beeGFSNodeSettings').nodeType,' ', variables('beeGFSNodeSettings').RAIDLevel)]",
-    "installLIS": "bash InstallLIS.sh"
+    ]
   },
   "resources": [
     {
       "type": "Microsoft.Compute/virtualMachineScaleSets",
-      "name": "[parameters('vmssName')]",
-      "location": "[variables('location')]",
+      "name": "[concat(parameters('vmssName'),copyIndex())]",
       "apiVersion": "[variables('computeApiVersion')]",
+      "location": "[variables('location')]",
       "sku": {
         "name": "[variables('beeGFSNodeSettings').VMsku]",
         "tier": "Standard",
-        "capacity": "[parameters('nodeCount')]"
+        "capacity": "[parameters('vmcount')]"
+      },
+      "copy": {
+        "name": "[parameters('vmssName')]",
+        "count": "[parameters('vmsscount')]"
       },
       "properties": {
         "overprovision": "false",
@@ -579,27 +392,6 @@
           "mode": "Manual"
         },
         "virtualMachineProfile": {
-
-          "networkProfile": {
-            "networkInterfaceConfigurations": [
-              {
-                "name": "[variables('nicName')]",
-                "properties": {
-                  "primary": "true",
-                  "ipConfigurations": [
-                    {
-                      "name": "[variables('ipConfigName')]",
-                      "properties": {
-                        "subnet": {
-                          "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/',variables('beeGFSNodeSettings').vnetRG, '/providers/Microsoft.Network/virtualNetworks/', variables('beeGFSNodeSettings').vnetName, '/subnets/', variables('beeGFSNodeSettings').subnetName)]"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          },
           "storageProfile": {
             "osDisk": {
               "createOption": "FromImage",
@@ -612,7 +404,7 @@
           },
           "osProfile": {
             "computerNamePrefix": "[parameters('vmssName')]",
-            "adminUsername": "[parameters('adminUsername')]",
+            "adminUsername": "[variables('nodeOSSettings').adminUserName]",
             "linuxConfiguration": {
               "disablePasswordAuthentication": "true",
               "ssh": {
@@ -625,10 +417,30 @@
               }
             }
           },
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "[variables('nicName')]",
+                "properties": {
+                  "primary": "true",
+                  "ipConfigurations": [
+                    {
+                      "name": "[variables('ipConfigName')]",
+                      "properties": {
+                        "subnet": {
+                          "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetName'))]"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
           "extensionProfile": {
             "extensions": [
               {
-                "name": "lapextension",
+                "name": "[concat('lapextension',copyIndex())]",
                 "properties": {
                   "publisher": "Microsoft.Azure.Extensions",
                   "type": "CustomScript",
@@ -636,61 +448,15 @@
                   "autoUpgradeMinorVersion": true,
                   "settings": {
                     "fileUris": [
-                      "[uri(deployment().properties.templateLink.uri, 'beegfsscripts/install_beegfs_storage.sh')]",
-                      "[uri(deployment().properties.templateLink.uri, 'beegfsscripts/InstallLIS.sh')]"
+                      "[uri(deployment().properties.templateLink.uri, 'beegfsscripts/install_beegfs_storage.sh')]"
                     ],
-                    "commandToExecute": "[concat('bash install_beegfs_storage.sh ', variables('installParams'),';',variables('installLIS'))]"
+                    "commandToExecute": "[concat('bash install_beegfs_storage.sh ', variables('installParams'))]"
                   }
                 }
               }
             ]
           }
         }
-      }
-    },
-    {
-      "type": "Microsoft.Insights/autoscaleSettings",
-      "apiVersion": "[variables('insightsApiVersion')]",
-      "name": "[concat(parameters('vmSSName'),'autoscalehost')]",
-      "location": "[variables('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]"
-      ],
-      "properties": {
-        "name": "[concat(parameters('vmSSName'),'autoscalehost')]",
-        "targetResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]",
-        "enabled": true,
-        "profiles": [
-          {
-            "name": "Profile2",
-            "capacity": {
-              "minimum": "1",
-              "maximum": "100",
-              "default": "1"
-            },
-            "rules": [
-              {
-                "metricTrigger": {
-                  "metricName": "Percentage CPU",
-                  "metricNamespace": "",
-                  "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]",
-                  "timeGrain": "PT1M",
-                  "statistic": "Average",
-                  "timeWindow": "PT5M",
-                  "timeAggregation": "Average",
-                  "operator": "GreaterThan",
-                  "threshold": 60.0
-                },
-                "scaleAction": {
-                  "direction": "Increase",
-                  "type": "ChangeCount",
-                  "value": "1",
-                  "cooldown": "PT1M"
-                }
-              }
-            ]
-          }
-        ]
       }
     }
   ]
