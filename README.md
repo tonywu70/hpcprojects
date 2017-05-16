@@ -1,20 +1,20 @@
 ## Deploy BeeGFS Master
-[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fazmigproject%2FBeeGFS%2Fmaster%2Fbeegfs-master.json)  
+[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Ftonywu70%2Fhpcprojects%2Fmaster%2Fbeegfs-master.json)  
 
 ## Deploy BeeGFS OSS, MDS and Client
-[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fazmigproject%2FBeeGFS%2Fmaster%2Fdeploy-beegfs.json)  
+[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Ftonywu70%2Fhpcprojects%2Fmaster%2Fdeploy-beegfs.json)  
 
 ## Deploy BeeGFS Master(HDD)
-[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fazmigproject%2FBeeGFS%2Fmaster%2Fbeegfs-master-hdd.json)  
+[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Ftonywu70%2Fhpcprojects%2Fmaster%2Fbeegfs-master-hdd.json)  
 
 ## Deploy BeeGFS OSS, MDS and Client(HDD)
-[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fazmigproject%2FBeeGFS%2Fmaster%2Fdeploy-beegfs-hdd.json)  
+[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Ftonywu70%2Fhpcprojects%2Fmaster%2Fdeploy-beegfs-hdd.json)  
 
 
 ### Check your deployment
 Once the deployment succeed, login to the master vm and run beegfs-check-servers command
 
-* Templates contain maximum available VM sizes however availability of VMs depends on the data center. Not all VM sizes are available in every data center.
+* Templates contain maximum available VM sizes however availability of VMs depends on the data center. Not all VM sizes are available in every data center. please make sure to do check it out before the selection of VM sku size.
 * Templates do not have a check to match number of disks supported by a VM. Please make sure to input correct number of disks which is supported by the VM selected for deployment.
 * There are few scripts that exist in "/home/username/Scripts" (username is the user created at the time of deployment.)
 	* Provide permission to scripts with sudo chmod +x <scriptname>
