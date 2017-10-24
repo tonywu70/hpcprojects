@@ -84,6 +84,8 @@
     }
   },
   "variables": {
+    "addressPrefix": "10.234.36.0/23",
+    "subnetPrefix": "10.234.37.64/27",  
     "virtualNetworkName": "VNET_EDA",
     "subnetName": "Subnet_Storage",
     "publicIPAddressName": "[concat(parameters('vmssName'), 'pip')]",
