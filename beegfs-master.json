@@ -84,10 +84,10 @@
     }
   },
   "variables": {
-    "addressPrefix": "10.0.0.0/16",
-    "subnetPrefix": "10.0.0.0/24",
-    "virtualNetworkName": "beegfs-vnet",
-    "subnetName": "beegfs-subnet",
+    #"addressPrefix": "10.0.0.0/16",
+    #"subnetPrefix": "10.0.0.0/24",
+    "virtualNetworkName": "VNET_EDA",
+    "subnetName": "Subnet_Storage",
     "publicIPAddressName": "[concat(parameters('vmssName'), 'pip')]",
     "loadBalancerName": "[concat(parameters('vmssName'), 'lb')]",
     "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]",
